@@ -6,12 +6,12 @@
     }
 
     # Grab some modules without depending on PowerShellGet
-    'WinSSH' = @{
+    'ProgramManagement' = @{
         DependencyType  = 'PSGalleryNuget'
         Version         = 'Latest'
     }
-    'NTFSSecurity' = @{
+    'UniversalDashboard.Community' = @{
         DependencyType  = 'PSGalleryNuget'
-        Version         = 'Latest'
+        Version         = 'PreRelease'
     }
 }
