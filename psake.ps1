@@ -99,31 +99,33 @@ if ($ModulesToInstallAndImport.Count -gt 0) {
     $ModuleDependenciesMap = InvokeModuleDependencies @InvModDepSplatParams
 }
 
-try {
-    Import-Module UniversalDashboard.Community -ErrorAction Stop
-}
-catch {
-    if ($_.Exception.Message -match "\.Net Framework") {
-        try {
-            Write-Host "Installing .Net Framework 4.7.2 ..."
-            $InstallDotNet47Result = Install-Program -ProgramName dotnet4.7.2 -ErrorAction Stop
+if (![bool]$(Get-Module UniversalDashboard.Community)) {
+    try {
+        Import-Module UniversalDashboard.Community -ErrorAction Stop
+    }
+    catch {
+        if ($_.Exception.Message -match "\.Net Framework") {
+            try {
+                Write-Host "Installing .Net Framework 4.7.2 ..."
+                $InstallDotNet47Result = Install-Program -ProgramName dotnet4.7.2 -ErrorAction Stop
+            }
+            catch {
+                Write-Error $_
+                Write-Warning ".Net Framework 4.7.2 was NOT installed successfully."
+                Write-Warning "The $ThisModule Module will NOT be loaded. Please run`n    Remove-Module $ThisModule"
+                $global:FunctionResult = "1"
+                return
+            }
+
+            Write-Warning ".Net Framework 4.7.2 was installed successfully, however *****you must restart $env:ComputerName***** before using the $ThisModule Module! Halting!"
+            return
         }
-        catch {
+        else {
             Write-Error $_
-            Write-Warning ".Net Framework 4.7.2 was NOT installed successfully."
-            Write-Warning "The PUDWinAdminCenter Module will NOT be loaded. Please run`n    Remove-Module PUDWinAdminCenter"
+            Write-Warning "The $ThisModule Module was NOT loaded successfully! Please run:`n    Remove-Module $ThisModule"
             $global:FunctionResult = "1"
             return
         }
-
-        Write-Warning ".Net Framework 4.7.2 was installed successfully, however you must restart $env:ComputerName before using the PUDWinAdminCenter Module! Halting!"
-        return
-    }
-    else {
-        Write-Error $_
-        Write-Warning "The $ThisModule Module was NOT loaded successfully! Please run:`n    Remove-Module $ThisModule"
-        $global:FunctionResult = "1"
-        return
     }
 }
 
@@ -243,8 +245,8 @@ Task Deploy -Depends Build {
 # SIG # Begin signature block
 # MIIMiAYJKoZIhvcNAQcCoIIMeTCCDHUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU9dQZ9yxzf9CGUpGD9pVMkZS9
-# +e6gggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUjDRdtfopzcs1NRdNnHYHZHVA
+# kcCgggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
 # 9w0BAQsFADAwMQwwCgYDVQQGEwNMQUIxDTALBgNVBAoTBFpFUk8xETAPBgNVBAMT
 # CFplcm9EQzAxMB4XDTE3MDkyMDIxMDM1OFoXDTE5MDkyMDIxMTM1OFowPTETMBEG
 # CgmSJomT8ixkARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMT
@@ -301,11 +303,11 @@ Task Deploy -Depends Build {
 # ARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMTB1plcm9TQ0EC
 # E1gAAAH5oOvjAv3166MAAQAAAfkwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwx
 # CjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGC
-# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFHEfYu1qHdgVGOWD
-# +0DNqhw4C6y6MA0GCSqGSIb3DQEBAQUABIIBAF/DhXp1X7vHq6lbslkwGB3/Gq2n
-# f4webNKyD2OZG85DUWHNNL/aHiW/4tAVKa8GwRt/wm2o1+Dukmb1jJFH+GzX/J7E
-# KSJAccEOeuYopOU3bXLHJdI/WsidScpMXx0IY39q71Q/+wCT33DfIa1lKWdI/8go
-# r7Ve9tAkygR6kkmSHJ9MNfRQC0k/9+XrZp2RSkcSgW3xiFgYDn49M2f0jcta9ga+
-# ksCkqCZZFOxeW4UnzIACWQXd2H5YwE2L1wCaN4UU1f8feS3j9n/mDDblWoX9Mh+P
-# lEwBgR/41j0iR16d/ZcZ+FoZkmRM2qBpI0JKuW+9rHQ+IVrKB+n7QBUcYow=
+# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFOOZsgPxsv4vZx3t
+# gi0803hg9t9uMA0GCSqGSIb3DQEBAQUABIIBAINbe76XCyF4KaO/I/dNu33IawvK
+# vsZMo80x4K/lzUL9IGhMs7TipMnWl4sqVyJ6OGXl2A2ZDeiJgriypL9Rb5MwSdSh
+# hD02rH0I5J8wRdlX61h1zAwUiCHsOLrYEDe6vkz2iAfUIcEuFb0blA2hbKCDBVZe
+# 49ciekUJjl3UztwPzIrd/dq3bYHDvzjhlQTETbttqoGEPb0e/WETBUX6ERjpPC0O
+# LfBlzeMSsA+BAPzBMzPwRhInjJ/RK+qMvcsOT9fvgBpnlE1ubvdF60xI2+S6JKd9
+# q3eu05lR7gDrm3kl/iKZ+SEyTK/q+krPeHA8Qp1LMN9zr4DZT5JYCkmQapQ=
 # SIG # End signature block

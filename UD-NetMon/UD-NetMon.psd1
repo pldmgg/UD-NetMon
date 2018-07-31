@@ -30,7 +30,7 @@ CompanyName = 'pldmgg'
 Copyright = '(c) 2018 pldmgg. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = '"Web-based GUI (PowerShell Universal Dashboard) that pings specified Remote Hosts on your Domain every 5 seconds. GitHub: https://github.com/pldmgg/UD-NetMon'
+Description = 'Web-based GUI (PowerShell Universal Dashboard) that pings specified Remote Hosts on your Domain every 5 seconds. GitHub: https://github.com/pldmgg/UD-NetMon'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '5.1'
@@ -69,7 +69,7 @@ PowerShellVersion = '5.1'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = 'Get-UDNetMon'
+FunctionsToExport = @('Get-UDNetMon')
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = '*'

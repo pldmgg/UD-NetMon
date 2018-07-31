@@ -1,5 +1,36 @@
+<#
+    .SYNOPSIS
+        This function starts a PowerShell Universal Dashboard (Web-based GUI) instance on the specified port on the
+        localhost. The Dashboard features a Network Monitor tool that pings the specified Remote Hosts in your Domain
+        every 5 seconds and reports the results to the site.
+
+    .DESCRIPTION
+        See .SYNOPSIS
+
+    .PARAMETER Port
+        This parameter is OPTIONAL, however, it has a default value of 80.
+
+        This parameter takes an integer between 1 and 32768 that represents the port on the localhost that the site
+        will run on.
+
+    .PARAMETER RemoveExistingPUD
+        This parameter is OPTIONAL, however, it has a default value of $True.
+
+        This parameter is a switch. If used, all running PowerShell Universal Dashboard instances will be removed
+        prior to starting the Network Monitor Dashboard.
+
+    .EXAMPLE
+        # Open an elevated PowerShell Session, import the module, and -
+
+        PS C:\Users\zeroadmin> Get-UDNetMon
+        
+#>
 function Get-UDNetMon {
     Param (
+        [Parameter(Mandatory=$False)]
+        [ValidateRange(1,32768)]
+        [int]$Port = 80,
+
         [Parameter(Mandatory=$False)]
         [switch]$RemoveExistingPUD = $True
     )
@@ -122,14 +153,14 @@ function Get-UDNetMon {
     $MyDashboard = New-UDDashboard -Pages $Pages
 
     # Start the Site
-    Start-UDDashboard -Dashboard $MyDashboard
+    Start-UDDashboard -Dashboard $MyDashboard -Port $Port
 }
 
 # SIG # Begin signature block
 # MIIMiAYJKoZIhvcNAQcCoIIMeTCCDHUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUw7syvTRdmPDhpAQg94f1AIwa
-# /Qygggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU0FwPV97dc0Ayv7rZlVeyGMkf
+# YqCgggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
 # 9w0BAQsFADAwMQwwCgYDVQQGEwNMQUIxDTALBgNVBAoTBFpFUk8xETAPBgNVBAMT
 # CFplcm9EQzAxMB4XDTE3MDkyMDIxMDM1OFoXDTE5MDkyMDIxMTM1OFowPTETMBEG
 # CgmSJomT8ixkARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMT
@@ -186,11 +217,11 @@ function Get-UDNetMon {
 # ARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMTB1plcm9TQ0EC
 # E1gAAAH5oOvjAv3166MAAQAAAfkwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwx
 # CjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGC
-# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFLdOQ2wUCbZKvGco
-# 9IwiQJ/+LrJrMA0GCSqGSIb3DQEBAQUABIIBABtOOhbcvpacTSiyJ1hQSDKh68/Z
-# YXot2FKUb53SaFcUb1o0r6BpE3bRpybQe8Dt2PpamMpjoRw+kwm3DgRyXfDTnVy1
-# BOo6Bp24Ak4yub4QICa6aNw5CsvWUfzifTDl23q+eGosqbF/ess6fnsIZrOnFbMQ
-# OWQ0/EjEsHIcIMitPjXFvHcI47qmTG9ysllwsK2F0oIqtpSPLXOjm+Enu7nauz2K
-# Xvc3V2oDn79nQfGVhjSvwfKPNmRwa+mo+DgsXNcxYrbpx51M0h/8afLsULx4cWmf
-# ukVuzTvwB/Js7geJXOChyo7P7fbLXfrdfk26vh1PGxnPNYr8Ua7s8aGglz0=
+# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFNy9GaGzK4IsQL4a
+# BwrYqvZu3darMA0GCSqGSIb3DQEBAQUABIIBAIFhamlqfIUcp4AuOjZt3usRrFBi
+# 3YeLI0rN2SEuOP1m1LzzWJfnoT4HWXsO9XxqKF1O83+KE+UeGIQLa+GIz0RGv+6S
+# Kk1LHu6fQz5Z6GtIe1NhxmQAxYxuD8jTIZbDOOK11oHLWX6r4Sl+LbvTWmauLDic
+# MZqwW4sE0mEt1oG+yfj3Yt+WK6JwWR3xzu5u6X7IQ4a+dd54jigo4OmU4vM9tUza
+# y2amU30c4DeWgKXYbirhxUMVEsKzdXC+/BbYUxeBMfGMFImSu58X1T3BhxX0VPhR
+# c3Rw83qyRLSKU8LRsgYNPnTQEzwJuJrPh+PzSdi/tWONsvQoPdc+OsDl4Dw=
 # SIG # End signature block

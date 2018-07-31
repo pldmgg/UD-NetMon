@@ -1,8 +1,14 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/github/pldmgg/=master&svg=true)](https://ci.appveyor.com/project/pldmgg/sudo/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/pldmgg/ud-netmon?branch=master&svg=true)](https://ci.appveyor.com/project/pldmgg/ud-netmon/branch/master)
 
 
 # UD-NetMon
-<Synopsis>
+Web-based GUI (PowerShell Universal Dashboard) that pings specified Remote Hosts on your Domain every 5 seconds.
+
+# Screenshots
+
+![Home](/Media/1Home.png)
+![HostSelect](/Media/2ServerSelection.png)
+![Monitor](/Media/3Monitor.png)
 
 ## Getting Started
 
@@ -27,12 +33,36 @@
 
 ## Examples
 
-### Scenario 1
+### Scenario 1: No Parameters
 
 ```powershell
-powershell code
+PS C:\Users\zeroadmin> Get-UDNetMon
+
+Name        Port Running
+----        ---- -------
+Dashboard0   80    True
+
 ```
+
+- Navigate to `http://localhost`
+- Click 'Network Monitor'
+- Select the Remote Hosts you want to monitor and click 'Submit'.
+
+### Scenario 2: Different Port
+
+```powershell
+PS C:\Users\zeroadmin> Get-UDNetMon -Port 8888
+
+Name        Port   Running
+----        ------ -------
+Dashboard1   8888    True
+
+```
+
+- Navigate to `http://localhost:8888`
+- Click 'Network Monitor'
+- Select the Remote Hosts you want to monitor and click 'Submit'.
 
 ## Notes
 
-* PSGallery: 
+* PSGallery: https://www.powershellgallery.com/packages/ud-netmon
