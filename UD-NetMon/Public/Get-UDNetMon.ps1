@@ -1,8 +1,5 @@
-function Get-PUDNetworkMonitor {
+function Get-UDNetMon {
     Param (
-        [Parameter(Mandatory=$True)]
-        [string]$DomainName,
-
         [Parameter(Mandatory=$False)]
         [switch]$RemoveExistingPUD = $True
     )
@@ -14,6 +11,7 @@ function Get-PUDNetworkMonitor {
 
     # Make sure we can resolve the $DomainName
     try {
+        $DomainName = $(Get-CimInstance Win32_ComputerSystem).Domain
         $ResolveDomainInfo = [System.Net.Dns]::Resolve($DomainName)
     }
     catch {
@@ -23,14 +21,8 @@ function Get-PUDNetworkMonitor {
     }
 
     # Get all Computers in Active Directory without the ActiveDirectory Module
-    $LDAPRootEntry = [System.DirectoryServices.DirectoryEntry]::new("LDAP://$DomainName")
-    $LDAPSearcher = [System.DirectoryServices.DirectorySearcher]::new($LDAPRootEntry)
-    $LDAPSearcher.Filter = "(objectClass=computer)"
-    $LDAPSearcher.SizeLimit = 0
-    $LDAPSearcher.PageSize = 250
-    $null = $LDAPSearcher.PropertiesToLoad.Add("name")
-    [System.Collections.ArrayList]$ServerList = $($LDAPSearcher.FindAll().Properties.GetEnumerator()).name
-    $null = $ServerList.Insert(0,"Please Select a Server")
+    [System.Collections.ArrayList]$RemoteHostList = $(GetComputerObjectsInLDAP).Name
+    $null = $RemoteHostList.Insert(0,"Please Select a Server")
 
 
     [System.Collections.ArrayList]$Pages = @()
@@ -48,12 +40,12 @@ function Get-PUDNetworkMonitor {
 
     # Create Network Monitor Page
     [scriptblock]$NMContentSB = {
-        for ($i=1; $i -lt $ServerList.Count; $i++) {
-            New-UDInputField -Type 'radioButtons' -Name "Server$i" -Values $ServerList[$i]
+        for ($i=1; $i -lt $RemoteHostList.Count; $i++) {
+            New-UDInputField -Type 'radioButtons' -Name "Server$i" -Values $RemoteHostList[$i]
         }
     }
     [System.Collections.ArrayList]$paramStringPrep = @()
-    for ($i=1; $i -lt $ServerList.Count; $i++) {
+    for ($i=1; $i -lt $RemoteHostList.Count; $i++) {
         $StringToAdd = '$' + "Server$i"
         $null = $paramStringPrep.Add($StringToAdd)
     }

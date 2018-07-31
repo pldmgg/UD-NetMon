@@ -99,21 +99,39 @@ if ($ModulesToInstallAndImport.Count -gt 0) {
     $ModuleDependenciesMap = InvokeModuleDependencies @InvModDepSplatParams
 }
 
+try {
+    Import-Module UniversalDashboard.Community -ErrorAction Stop
+}
+catch {
+    if ($_.Exception.Message -match "\.Net Framework") {
+        try {
+            Write-Host "Installing .Net Framework 4.7.2 ..."
+            $InstallDotNet47Result = Install-Program -ProgramName dotnet4.7.2 -ErrorAction Stop
+        }
+        catch {
+            Write-Error $_
+            Write-Warning ".Net Framework 4.7.2 was NOT installed successfully."
+            Write-Warning "The PUDWinAdminCenter Module will NOT be loaded. Please run`n    Remove-Module PUDWinAdminCenter"
+            $global:FunctionResult = "1"
+            return
+        }
+
+        Write-Warning ".Net Framework 4.7.2 was installed successfully, however you must restart $env:ComputerName before using the PUDWinAdminCenter Module! Halting!"
+        return
+    }
+    else {
+        Write-Error $_
+        Write-Warning "The $ThisModule Module was NOT loaded successfully! Please run:`n    Remove-Module $ThisModule"
+        $global:FunctionResult = "1"
+        return
+    }
+}
+
 # Public Functions
 '@
 
     ###### BEGIN Unique Additions to this Module ######
-    # Add PowerShim Module
-    <#
-    $PowerShimFileContent = Get-Content "$env:BHModulePath\powershim.psm1"
-    $SigBlockLineNumber = $PowerShimFileContent.IndexOf('# SIG # Begin signature block')
-    $ContentSansSigBlock = $($($PowerShimFileContent[0..$($SigBlockLineNumber-1)]) -join "`n").Trim() -split "`n"
-    $UniqueCode = $ContentSansSigBlock -join "`n"
-
-    if ($UniqueCode) {
-        $BoilerPlateFunctionSourcing = $BoilerPlateFunctionSourcing + $UniqueCode
-    }
-    #>
+    # NONE
     ###### END Unique Additions to this Module ######
 
     Set-Content -Path "$env:BHModulePath\$env:BHProjectName.psm1" -Value $BoilerPlateFunctionSourcing

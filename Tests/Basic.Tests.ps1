@@ -7,14 +7,14 @@ param(
 # NOTE: `Set-BuildEnvironment -Force -Path $PSScriptRoot` from build.ps1 makes the following $env: available:
 <#
     $env:BHBuildSystem = "Unknown"
-    $env:BHProjectPath = "U:\powershell\ProjectRepos\Sudo"
+    $env:BHProjectPath = "U:\powershell\ProjectRepos\UD-NetMon"
     $env:BHBranchName = "master"
     $env:BHCommitMessage = "!deploy"
     $env:BHBuildNumber = 0
-    $env:BHProjectName = "Sudo"
-    $env:BHPSModuleManifest = "U:\powershell\ProjectRepos\Sudo\Sudo\Sudo.psd1"
-    $env:BHModulePath = "U:\powershell\ProjectRepos\Sudo\Sudo"
-    $env:BHBuildOutput = "U:\powershell\ProjectRepos\Sudo\BuildOutput"
+    $env:BHProjectName = "UD-NetMon"
+    $env:BHPSModuleManifest = "U:\powershell\ProjectRepos\UD-NetMon\UD-NetMon\UD-NetMon.psd1"
+    $env:BHModulePath = "U:\powershell\ProjectRepos\UD-NetMon\UD-NetMon"
+    $env:BHBuildOutput = "U:\powershell\ProjectRepos\UD-NetMon\BuildOutput"
 #>
 
 # Verbose output for non-master builds on appveyor
@@ -54,9 +54,7 @@ Describe -Name "General Project Validation: $env:BHProjectName" -Tag 'Validation
         $Module = Get-Module $env:BHProjectName
         $Module.Name -eq $env:BHProjectName | Should Be $True
         $Commands = $Module.ExportedCommands.Keys
-        $Commands -contains 'AddWinRMTrustLocalHost' | Should Be $False
-        $Commands -contains 'ConvertFromHCLToPrintF' | Should Be $False
-        $Commands -contains 'GetCurrentUser' | Should Be $False
+        $Commands -contains 'GetComputerObjectsInLDAP' | Should Be $False
         $Commands -contains 'GetDomainController' | Should Be $False
         $Commands -contains 'GetElevation' | Should Be $False
         $Commands -contains 'GetGroupObjectsInLDAP' | Should Be $False
@@ -65,46 +63,33 @@ Describe -Name "General Project Validation: $env:BHProjectName" -Tag 'Validation
         $Commands -contains 'GetUserObjectsInLDAP' | Should Be $False
         $Commands -contains 'InvokeModuleDependencies' | Should Be $False
         $Commands -contains 'InvokePSCompatibility' | Should Be $False
+        $Commands -contains 'ManualPSGalleryModuleInstall' | Should Be $False
         $Commands -contains 'NewUniqueString' | Should Be $False
-        $Commands -contains 'PauseForWarning' | Should Be $False
         $Commands -contains 'ResolveHost' | Should Be $False
         $Commands -contains 'TestIsValidIPAddress' | Should Be $False
         $Commands -contains 'TestLDAP' | Should Be $False
         $Commands -contains 'TestPort' | Should Be $False
-        $Commands -contains 'UnzipFile' | Should Be $False
         
-        $Commands -contains 'Add-CAPubKeyToSSHAndSSHDConfig' | Should Be $True
-        $Commands -contains 'Configure-VaultServerForLDAPAuth' | Should Be $True
-        $Commands -contains 'Configure-VaultServerForSSHManagement' | Should Be $True
-        $Commands -contains 'Get-LDAPCert' | Should Be $True
-        $Commands -contains 'Get-VaultAccessorLookup' | Should Be $True
-        $Commands -contains 'Get-VaultLogin' | Should Be $True
-        $Commands -contains 'Get-VaultTokenAccessors' | Should Be $True
-        $Commands -contains 'Get-VaultTokens' | Should Be $True
-        $Commands -contains 'Manage-StoredCredentials' | Should Be $True
-        $Commands -contains 'New-SSHCredentials' | Should Be $True
-        $Commands -contains 'Revoke-VaultToken' | Should Be $True
-        $Commands -contains 'Sign-SSHHostPublicKey' | Should Be $True
-        $Commands -contains 'Sign-SSHUserPublicKey' | Should Be $True
+        $Commands -contains 'Get-UDNetMon' | Should Be $True
     }
 
     It "Module '$env:BHProjectName' Private Functions Are Available in Internal Scope" {
         $Module = Get-Module $env:BHProjectName
-        [bool]$Module.Invoke({Get-Item function:AddWinRMTrustLocalHost}) | Should Be $True
-        [bool]$Module.Invoke({Get-Item function:ConvertFromHCLToPrintF}) | Should Be $True
-        [bool]$Module.Invoke({Get-Item function:GetCurrentUser}) | Should Be $True
+        [bool]$Module.Invoke({Get-Item function:GetComputerObjectsInLDAP}) | Should Be $True
         [bool]$Module.Invoke({Get-Item function:GetDomainController}) | Should Be $True
         [bool]$Module.Invoke({Get-Item function:GetElevation}) | Should Be $True
         [bool]$Module.Invoke({Get-Item function:GetGroupObjectsInLDAP}) | Should Be $True
         [bool]$Module.Invoke({Get-Item function:GetModuleDependencies}) | Should Be $True
+        [bool]$Module.Invoke({Get-Item function:GetNativePath}) | Should Be $True
+        [bool]$Module.Invoke({Get-Item function:GetUserObjectsInLDAP}) | Should Be $True
+        [bool]$Module.Invoke({Get-Item function:InvokeModuleDependencies}) | Should Be $True
         [bool]$Module.Invoke({Get-Item function:InvokePSCompatibility}) | Should Be $True
+        [bool]$Module.Invoke({Get-Item function:ManualPSGalleryModuleInstall}) | Should Be $True
         [bool]$Module.Invoke({Get-Item function:NewUniqueString}) | Should Be $True
-        [bool]$Module.Invoke({Get-Item function:PauseForWarning}) | Should Be $True
         [bool]$Module.Invoke({Get-Item function:ResolveHost}) | Should Be $True
         [bool]$Module.Invoke({Get-Item function:TestIsValidIPAddress}) | Should Be $True
         [bool]$Module.Invoke({Get-Item function:TestLDAP}) | Should Be $True
         [bool]$Module.Invoke({Get-Item function:TestPort}) | Should Be $True
-        [bool]$Module.Invoke({Get-Item function:UnzipFile}) | Should Be $True
     }
 }
 
