@@ -33,36 +33,6 @@ if ($ModulesToInstallAndImport.Count -gt 0) {
     $ModuleDependenciesMap = InvokeModuleDependencies @InvModDepSplatParams
 }
 
-if (![bool]$(Get-Module UniversalDashboard.Community)) {
-    try {
-        Import-Module UniversalDashboard.Community -ErrorAction Stop
-    }
-    catch {
-        if ($_.Exception.Message -match "\.Net Framework") {
-            try {
-                Write-Host "Installing .Net Framework 4.7.2 ... This will take a little while, and you will need to restart afterwards..."
-                $InstallDotNet47Result = Install-Program -ProgramName dotnet4.7.2 -ErrorAction Stop
-            }
-            catch {
-                Write-Error $_
-                Write-Warning ".Net Framework 4.7.2 was NOT installed successfully."
-                Write-Warning "The $ThisModule Module will NOT be loaded. Please run`n    Remove-Module $ThisModule"
-                $global:FunctionResult = "1"
-                return
-            }
-
-            Write-Warning ".Net Framework 4.7.2 was installed successfully, however *****you must restart $env:ComputerName***** before using the $ThisModule Module! Halting!"
-            return
-        }
-        else {
-            Write-Error $_
-            Write-Warning "The $ThisModule Module was NOT loaded successfully! Please run:`n    Remove-Module $ThisModule"
-            $global:FunctionResult = "1"
-            return
-        }
-    }
-}
-
 # Public Functions
 
 
@@ -228,6 +198,37 @@ function Get-UDNetMon {
 }
 
 
+
+if (![bool]$(Get-Module UniversalDashboard.Community)) {
+    try {
+        Import-Module UniversalDashboard.Community -ErrorAction Stop
+    }
+    catch {
+        if ($_.Exception.Message -match "\.Net Framework") {
+            try {
+                Write-Host "Installing .Net Framework 4.7.2 ... This will take a little while, and you will need to restart afterwards..."
+                $InstallDotNet47Result = Install-Program -ProgramName dotnet4.7.2 -ErrorAction Stop
+            }
+            catch {
+                Write-Error $_
+                Write-Warning ".Net Framework 4.7.2 was NOT installed successfully."
+                Write-Warning "The $ThisModule Module will NOT be loaded. Please run`n    Remove-Module $ThisModule"
+                $global:FunctionResult = "1"
+                return
+            }
+
+            Write-Warning ".Net Framework 4.7.2 was installed successfully, however *****you must restart $env:ComputerName***** before using the $ThisModule Module! Halting!"
+            return
+        }
+        else {
+            Write-Error $_
+            Write-Warning "The $ThisModule Module was NOT loaded successfully! Please run:`n    Remove-Module $ThisModule"
+            $global:FunctionResult = "1"
+            return
+        }
+    }
+}
+
 [System.Collections.ArrayList]$script:FunctionsForSBUse = @(
     ${Function:GetComputerObjectsInLDAP}.Ast.Extent.Text
     ${Function:GetDomainController}.Ast.Extent.Text
@@ -250,8 +251,8 @@ function Get-UDNetMon {
 # SIG # Begin signature block
 # MIIMiAYJKoZIhvcNAQcCoIIMeTCCDHUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZVp9QMMzBAHGVqlPZwdkU6vc
-# e3qgggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUHfmaZBffI9+JvsGEjmaIWFFj
+# KEagggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
 # 9w0BAQsFADAwMQwwCgYDVQQGEwNMQUIxDTALBgNVBAoTBFpFUk8xETAPBgNVBAMT
 # CFplcm9EQzAxMB4XDTE3MDkyMDIxMDM1OFoXDTE5MDkyMDIxMTM1OFowPTETMBEG
 # CgmSJomT8ixkARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMT
@@ -308,11 +309,11 @@ function Get-UDNetMon {
 # ARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMTB1plcm9TQ0EC
 # E1gAAAH5oOvjAv3166MAAQAAAfkwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwx
 # CjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGC
-# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFPLYnFJv3vdneb+Q
-# Dj5JNnsm1F0IMA0GCSqGSIb3DQEBAQUABIIBAL2OP1hjutXWnpAEFQAB1g1strtf
-# TXLhtyi8DSCgHKH/zUmRsTCI5kGBhGTbFqtYTgSN76MCSsDLR7vPV+ndWT1PYNA3
-# AU0NBCVtq6KEl3pVNGaPtBjLE/JkgXmVTxaBEgFjLDIOFNqZowyo7oiHTCDm7hQq
-# LxE6e6LSEoNoeaoDrXRiLX64cbp1L3KqjngRIbMU33eiqQC4eh3kMT8aS6GIbqoM
-# TqIcyqQ0YqJJyKmZrc17WfKUaACW6JQvxJLFI9ujbMMmDRyzzJxB78J5sLLvOrhH
-# Gc0FOpmBrcFK3idK8ONVctn8YnGZ328unXtsgVeP7Wx4G5aQTXxVH9y1o2k=
+# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFMcPyOG5w/rnfDqm
+# jaEfcVzd1sYfMA0GCSqGSIb3DQEBAQUABIIBAGQ9a/3VYVwI9gYNkv49ukvHvkNC
+# zWA5A3R1vVr4L58rC36e11Lqy5FiVmFWXVv0RQDcXu2d6S5fAMJC3jwtnoilgeQL
+# kdq7ZvuXDGOqPHPJQc3SoEpDRXB/+1SHe7FhMS8quE4+ZasveS3EAjV27ao3cgG4
+# 6Q73Skkxl1lUKbTxoySHyLcVRdiIsyW+c/krtds/yCqSyDM/o76I9zDMnGtskTm1
+# qfIcHayxHhmDPYLZKUVnHHdkFJ4Y4+fRRuVyztxhCbynojUfQvSWlwWmZeW+DPpo
+# Fkra6QxP5WXisivdoppbAzYpOkEuiCuT/mky3U8M26rL7IpRIm356V+Wr3o=
 # SIG # End signature block

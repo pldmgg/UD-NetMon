@@ -70,7 +70,7 @@ Describe -Name "General Project Validation: $env:BHProjectName" -Tag 'Validation
         $Commands -contains 'TestLDAP' | Should Be $False
         $Commands -contains 'TestPort' | Should Be $False
         
-        #$Commands -contains 'Get-UDNetMon' | Should Be $True
+        $Commands -contains 'Get-UDNetMon' | Should Be $True
     }
 
     It "Module '$env:BHProjectName' Private Functions Are Available in Internal Scope" {

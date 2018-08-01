@@ -99,6 +99,30 @@ if ($ModulesToInstallAndImport.Count -gt 0) {
     $ModuleDependenciesMap = InvokeModuleDependencies @InvModDepSplatParams
 }
 
+# Public Functions
+'@
+
+    ###### BEGIN Unique Additions to this Module ######
+    # NONE
+    ###### END Unique Additions to this Module ######
+
+    Set-Content -Path "$env:BHModulePath\$env:BHProjectName.psm1" -Value $BoilerPlateFunctionSourcing
+
+    [System.Collections.ArrayList]$FunctionTextToAdd = @()
+    foreach ($ScriptFileItem in $PublicScriptFiles) {
+        $FileContent = Get-Content $ScriptFileItem.FullName
+        $SigBlockLineNumber = $FileContent.IndexOf('# SIG # Begin signature block')
+        $FunctionSansSigBlock = $($($FileContent[0..$($SigBlockLineNumber-1)]) -join "`n").Trim() -split "`n"
+        $null = $FunctionTextToAdd.Add("`n")
+        $null = $FunctionTextToAdd.Add($FunctionSansSigBlock)
+    }
+    $null = $FunctionTextToAdd.Add("`n")
+
+    Add-Content -Value $FunctionTextToAdd -Path "$env:BHModulePath\$env:BHProjectName.psm1"
+
+    # Add the Import-Module Universal.Dashboard Module else install .Net Framework 4.7.2 code
+    $ImportUDCommCode = @'
+
 if (![bool]$(Get-Module UniversalDashboard.Community)) {
     try {
         Import-Module UniversalDashboard.Community -ErrorAction Stop
@@ -129,26 +153,9 @@ if (![bool]$(Get-Module UniversalDashboard.Community)) {
     }
 }
 
-# Public Functions
 '@
 
-    ###### BEGIN Unique Additions to this Module ######
-    # NONE
-    ###### END Unique Additions to this Module ######
-
-    Set-Content -Path "$env:BHModulePath\$env:BHProjectName.psm1" -Value $BoilerPlateFunctionSourcing
-
-    [System.Collections.ArrayList]$FunctionTextToAdd = @()
-    foreach ($ScriptFileItem in $PublicScriptFiles) {
-        $FileContent = Get-Content $ScriptFileItem.FullName
-        $SigBlockLineNumber = $FileContent.IndexOf('# SIG # Begin signature block')
-        $FunctionSansSigBlock = $($($FileContent[0..$($SigBlockLineNumber-1)]) -join "`n").Trim() -split "`n"
-        $null = $FunctionTextToAdd.Add("`n")
-        $null = $FunctionTextToAdd.Add($FunctionSansSigBlock)
-    }
-    $null = $FunctionTextToAdd.Add("`n")
-
-    Add-Content -Value $FunctionTextToAdd -Path "$env:BHModulePath\$env:BHProjectName.psm1"
+    Add-Content -Value $ImportUDCommCode -Path "$env:BHModulePath\$env:BHProjectName.psm1"
 
     # Finally, add array the variables contained in VariableLibrary.ps1 if it exists in case we want to use this Module Remotely
     if (Test-Path "$env:BHModulePath\VariableLibrary.ps1") {
@@ -245,8 +252,8 @@ Task Deploy -Depends Build {
 # SIG # Begin signature block
 # MIIMiAYJKoZIhvcNAQcCoIIMeTCCDHUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUjIXFVSeKlgsdFLGri+h9+Eux
-# CNOgggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUmlYBmtIYQGgrNWoZw4HhwFjA
+# zxKgggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
 # 9w0BAQsFADAwMQwwCgYDVQQGEwNMQUIxDTALBgNVBAoTBFpFUk8xETAPBgNVBAMT
 # CFplcm9EQzAxMB4XDTE3MDkyMDIxMDM1OFoXDTE5MDkyMDIxMTM1OFowPTETMBEG
 # CgmSJomT8ixkARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMT
@@ -303,11 +310,11 @@ Task Deploy -Depends Build {
 # ARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMTB1plcm9TQ0EC
 # E1gAAAH5oOvjAv3166MAAQAAAfkwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwx
 # CjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGC
-# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFPSH5JqPWQ1zB3Rx
-# iaC5L5HFdkrYMA0GCSqGSIb3DQEBAQUABIIBAMM3XCii3gIORudtKOOycF2kEjzP
-# b34IJSlNev8LCSwXA6GUsKqHS2PpJRvYC4cFZmOq7e7QGv7GeIpmDycsCbdL6t1p
-# qgjoXKFLz5QUGJrsHlmjz2ATDCZauCOuaiPSkMQx820FM1KAb6B3+cFsV1SSlRqb
-# c+08P2dIXrNIMxSOjJ8zWG5O/Adm7avc7KukBwyF9caKsezPLokqrbnqdXA/mDV4
-# vnuxCDMH7rflRLENDDluu6aSJckK6NRW9HXOUGG+guahbSci/DCbWizvjTEyzne0
-# F8jri2WaTXfPY7sqEsR+F6mkyFwyx/NuunAF39DeR67mpm4nzvml4TnV/6Q=
+# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFE+lsHqRu2w3wDJw
+# SzvT8RRF53/XMA0GCSqGSIb3DQEBAQUABIIBADolwlQOvNK0TE7oWjauZhkk0HxI
+# eD69zCJMV3ie5BId2yCVlhAkKcqswXKS4yfpge0A/RO9S7awCUqX7spBHI+ZyT20
+# 7HQXVHWXDleYJ/EIKnb5rK94vsoRbtBvAkgqmQrGX3F+oGKy4GmNs+dzNbjPvyA7
+# /hAymAmTmkEu+4GR3ygPUmLavFsJva7NqcM7bSgVzwAsNzgAzE1ipku96Gelw1MG
+# PoSVBA9y2hNEHd6xFJzgYKpcV6u08nGWWbYKhtPBoA13UQdu6L14OZJnTK6rTbWW
+# dracDVDusEZkYGwhzIelW4d79J1iD0zYmC19j7R3qyRLvRy/vJeIQWaUmSI=
 # SIG # End signature block
