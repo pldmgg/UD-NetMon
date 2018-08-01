@@ -1,6 +1,6 @@
 # Change log
 
-## 1.0.0 (July 31, 2018)
+## 0.9.0 (July 31, 2018)
 
 - Created
 
