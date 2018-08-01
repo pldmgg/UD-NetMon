@@ -411,64 +411,18 @@ function InvokePSCompatibility {
         }
     }
     foreach ($ModObj in $RequiredLocallyAvailableModulesScan.WinPSModuleDependencies) {
-        Write-Verbose "Attempting import of $($ModObj.ModuleName)..."
-        try {
-            Remove-Variable -Name "CompatErr" -ErrorAction SilentlyContinue
-            $tempfile = [IO.Path]::Combine([IO.Path]::GetTempPath(), [IO.Path]::GetRandomFileName())
-            Import-WinModule $ModObj.ModuleName -NoClobber -Force -ErrorVariable CompatErr 2>$tempfile
-
-            if ($CompatErr.Count -gt 0) {
-                Write-Verbose "Import of $($ModObj.ModuleName) failed..."
-                Remove-Module $ModObj.ModuleName -ErrorAction SilentlyContinue
-                Remove-Item $tempfile -Force -ErrorAction SilentlyContinue
-                throw "ModuleNotImportedCleanly"
-            }
-
-            # Make sure the PSSession Type Accelerator exists
-            $TypeAccelerators = [psobject].Assembly.GetType("System.Management.Automation.TypeAccelerators")::get
-            if ($TypeAccelerators.Name -notcontains "PSSession") {
-                [PowerShell].Assembly.GetType("System.Management.Automation.TypeAccelerators")::Add("PSSession","System.Management.Automation.Runspaces.PSSession")
-            }
-            
-            Invoke-WinCommand -ComputerName localhost -ScriptBlock {
-                Import-Module $args[0] -Scope Global -NoClobber -Force -WarningAction SilentlyContinue
-            } -ArgumentList $ModObj.ModuleName -ErrorAction Stop
-
-            $ModuleInfo = [pscustomobject]@{
-                ModulePSCompatibility   = "WinPS"
-                ModuleName              = $ModObj.ModuleName
-                ManifestFileItem        = $ModObj.ManifestFileItem
-            }
-
-            $ModuleLoadedImplictly = [bool]$(Get-Module $ModObj.ModuleName)
-            $ModuleLoadedInPSSession = [bool]$(
-                Invoke-WinCommand -ComputerName localhost -ScriptBlock {
-                    Get-Module $args[0]
-                } -ArgumentList $ModObj.ModuleName -ErrorAction SilentlyContinue
-            )
-
-            if ($ModuleLoadedImplictly -or $ModuleLoadedInPSSession -and
-            $SuccessfulModuleImports.ManifestFileItem.FullName -notcontains $ModuleInfo.ManifestFileItem.FullName
-            ) {
-                $null = $SuccessfulModuleImports.Add($ModuleInfo)
-            }
-        }
-        catch {
-            Write-Verbose "Problem importing module '$($ModObj.ModuleName)'...trying via Manifest File..."
-
+        if ($SuccessfulModuleImports.ModuleName -notcontains $ModObj.ModuleName) {
+            Write-Verbose "Attempting import of $($ModObj.ModuleName)..."
             try {
-                if ($_.Exception.Message -eq "ModuleNotImportedCleanly") {
-                    Write-Verbose "Import of $($ModObj.ModuleName) failed..."
-                    throw "FailedImport"
-                }
-
                 Remove-Variable -Name "CompatErr" -ErrorAction SilentlyContinue
                 $tempfile = [IO.Path]::Combine([IO.Path]::GetTempPath(), [IO.Path]::GetRandomFileName())
-                Import-WinModule $ModObj.ManifestFileItem.FullName -NoClobber -Force -ErrorVariable CompatErr 2>$tempfile
+                Import-WinModule $ModObj.ModuleName -NoClobber -Force -ErrorVariable CompatErr 2>$tempfile
 
                 if ($CompatErr.Count -gt 0) {
+                    Write-Verbose "Import of $($ModObj.ModuleName) failed..."
                     Remove-Module $ModObj.ModuleName -ErrorAction SilentlyContinue
                     Remove-Item $tempfile -Force -ErrorAction SilentlyContinue
+                    throw "ModuleNotImportedCleanly"
                 }
 
                 # Make sure the PSSession Type Accelerator exists
@@ -479,7 +433,7 @@ function InvokePSCompatibility {
                 
                 Invoke-WinCommand -ComputerName localhost -ScriptBlock {
                     Import-Module $args[0] -Scope Global -NoClobber -Force -WarningAction SilentlyContinue
-                } -ArgumentList $ModObj.ManifestFileItem.FullName -ErrorAction Stop
+                } -ArgumentList $ModObj.ModuleName -ErrorAction Stop
 
                 $ModuleInfo = [pscustomobject]@{
                     ModulePSCompatibility   = "WinPS"
@@ -501,13 +455,61 @@ function InvokePSCompatibility {
                 }
             }
             catch {
-                $ModuleInfo = [pscustomobject]@{
-                    ModulePSCompatibility   = "WinPS"
-                    ModuleName              = $ModObj.ModuleName
-                    ManifestFileItem        = $ModObj.ManifestFileItem
+                Write-Verbose "Problem importing module '$($ModObj.ModuleName)'...trying via Manifest File..."
+
+                try {
+                    if ($_.Exception.Message -eq "ModuleNotImportedCleanly") {
+                        Write-Verbose "Import of $($ModObj.ModuleName) failed..."
+                        throw "FailedImport"
+                    }
+
+                    Remove-Variable -Name "CompatErr" -ErrorAction SilentlyContinue
+                    $tempfile = [IO.Path]::Combine([IO.Path]::GetTempPath(), [IO.Path]::GetRandomFileName())
+                    Import-WinModule $ModObj.ManifestFileItem.FullName -NoClobber -Force -ErrorVariable CompatErr 2>$tempfile
+
+                    if ($CompatErr.Count -gt 0) {
+                        Remove-Module $ModObj.ModuleName -ErrorAction SilentlyContinue
+                        Remove-Item $tempfile -Force -ErrorAction SilentlyContinue
+                    }
+
+                    # Make sure the PSSession Type Accelerator exists
+                    $TypeAccelerators = [psobject].Assembly.GetType("System.Management.Automation.TypeAccelerators")::get
+                    if ($TypeAccelerators.Name -notcontains "PSSession") {
+                        [PowerShell].Assembly.GetType("System.Management.Automation.TypeAccelerators")::Add("PSSession","System.Management.Automation.Runspaces.PSSession")
+                    }
+                    
+                    Invoke-WinCommand -ComputerName localhost -ScriptBlock {
+                        Import-Module $args[0] -Scope Global -NoClobber -Force -WarningAction SilentlyContinue
+                    } -ArgumentList $ModObj.ManifestFileItem.FullName -ErrorAction Stop
+
+                    $ModuleInfo = [pscustomobject]@{
+                        ModulePSCompatibility   = "WinPS"
+                        ModuleName              = $ModObj.ModuleName
+                        ManifestFileItem        = $ModObj.ManifestFileItem
+                    }
+
+                    $ModuleLoadedImplictly = [bool]$(Get-Module $ModObj.ModuleName)
+                    $ModuleLoadedInPSSession = [bool]$(
+                        Invoke-WinCommand -ComputerName localhost -ScriptBlock {
+                            Get-Module $args[0]
+                        } -ArgumentList $ModObj.ModuleName -ErrorAction SilentlyContinue
+                    )
+
+                    if ($ModuleLoadedImplictly -or $ModuleLoadedInPSSession -and
+                    $SuccessfulModuleImports.ManifestFileItem.FullName -notcontains $ModuleInfo.ManifestFileItem.FullName
+                    ) {
+                        $null = $SuccessfulModuleImports.Add($ModuleInfo)
+                    }
                 }
-                if ($FailedModuleImports.ManifestFileItem.FullName -notcontains $ModuleInfo.ManifestFileItem.FullName) {
-                    $null = $FailedModuleImports.Add($ModuleInfo)
+                catch {
+                    $ModuleInfo = [pscustomobject]@{
+                        ModulePSCompatibility   = "WinPS"
+                        ModuleName              = $ModObj.ModuleName
+                        ManifestFileItem        = $ModObj.ManifestFileItem
+                    }
+                    if ($FailedModuleImports.ManifestFileItem.FullName -notcontains $ModuleInfo.ManifestFileItem.FullName) {
+                        $null = $FailedModuleImports.Add($ModuleInfo)
+                    }
                 }
             }
         }
@@ -642,8 +644,8 @@ function InvokePSCompatibility {
 # SIG # Begin signature block
 # MIIMiAYJKoZIhvcNAQcCoIIMeTCCDHUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU9N3TShfwL1kOALLFB+wCo4El
-# xZWgggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUfQBMrlM9AY/1axKGvkwqwCAL
+# Vd2gggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
 # 9w0BAQsFADAwMQwwCgYDVQQGEwNMQUIxDTALBgNVBAoTBFpFUk8xETAPBgNVBAMT
 # CFplcm9EQzAxMB4XDTE3MDkyMDIxMDM1OFoXDTE5MDkyMDIxMTM1OFowPTETMBEG
 # CgmSJomT8ixkARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMT
@@ -700,11 +702,11 @@ function InvokePSCompatibility {
 # ARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMTB1plcm9TQ0EC
 # E1gAAAH5oOvjAv3166MAAQAAAfkwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwx
 # CjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGC
-# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFAfAhcUo46R6+PGL
-# xru/5XiaF/jIMA0GCSqGSIb3DQEBAQUABIIBAJOeTPTmFE8HGAiDJzou24Egek79
-# zXYZnkDoUHd8l1Qb4tUQaYAEZa69n1SIWsNYl8iJ7san3NPeVp/isXX0rx6js/xm
-# 98MfjY/QgSuQZ+Xf6tPTj8wY6ToQCTfLJKr9SKh43EBJ0j5a6R+DLW3RlNsSMJeM
-# RZqlMHeRJwUcyEkxS3fqCGQtNgmBvthX8hZuqnmfqCZr/5zvsB6qDcyI51s+6Jw/
-# 5HBFMtq7H8RcS8zZsINKA6pB0wBxt8I+7pIvOE/8vlxn5noEuG486r+V25fGiBBN
-# 8VMzNsj9bqwtYLXgGZ7q3rkVdZgpxIOAmUGBrEyC8nIHe8k8YLPyhuNWx+A=
+# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFBrAinzloWS+wNvV
+# LzaDVkDO87WmMA0GCSqGSIb3DQEBAQUABIIBAFPttvG9ZUyHkrzzyBE3txI8yIIh
+# 0loyKSzDTYeZKKQEZKtxAtE0QQy4ClUmWFxGSN3CUrZw0Bjha+A66MRq6ISuj54n
+# 7w6CubT16ydpoXWa0CbzSq6qGJ8nuinIMmAMY1VEpBhPqUjNVAWi3eijwJxcvgxJ
+# GNpot/3/8F6sWYlFNiJn2Zi7qRcCPP7GblQvT2LygLJyqRTi4PUa13eMnUK3Urda
+# d0LwGbxO7MkrI9BDBDQmBiAEum8RQHwWGHSFVjXHMHSX49uErngyHuTP2m68odc3
+# I6IbIxmLjDVqecEwEcTUDrHyJqjiTVEFDeePlK/3GrAsX4t7mxbG3eHJZvY=
 # SIG # End signature block

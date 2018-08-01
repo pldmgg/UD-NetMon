@@ -106,7 +106,7 @@ if (![bool]$(Get-Module UniversalDashboard.Community)) {
     catch {
         if ($_.Exception.Message -match "\.Net Framework") {
             try {
-                Write-Host "Installing .Net Framework 4.7.2 ..."
+                Write-Host "Installing .Net Framework 4.7.2 ... This will take a little while, and you will need to restart afterwards..."
                 $InstallDotNet47Result = Install-Program -ProgramName dotnet4.7.2 -ErrorAction Stop
             }
             catch {
@@ -245,8 +245,8 @@ Task Deploy -Depends Build {
 # SIG # Begin signature block
 # MIIMiAYJKoZIhvcNAQcCoIIMeTCCDHUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUjDRdtfopzcs1NRdNnHYHZHVA
-# kcCgggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUjIXFVSeKlgsdFLGri+h9+Eux
+# CNOgggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
 # 9w0BAQsFADAwMQwwCgYDVQQGEwNMQUIxDTALBgNVBAoTBFpFUk8xETAPBgNVBAMT
 # CFplcm9EQzAxMB4XDTE3MDkyMDIxMDM1OFoXDTE5MDkyMDIxMTM1OFowPTETMBEG
 # CgmSJomT8ixkARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMT
@@ -303,11 +303,11 @@ Task Deploy -Depends Build {
 # ARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMTB1plcm9TQ0EC
 # E1gAAAH5oOvjAv3166MAAQAAAfkwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwx
 # CjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGC
-# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFOOZsgPxsv4vZx3t
-# gi0803hg9t9uMA0GCSqGSIb3DQEBAQUABIIBAINbe76XCyF4KaO/I/dNu33IawvK
-# vsZMo80x4K/lzUL9IGhMs7TipMnWl4sqVyJ6OGXl2A2ZDeiJgriypL9Rb5MwSdSh
-# hD02rH0I5J8wRdlX61h1zAwUiCHsOLrYEDe6vkz2iAfUIcEuFb0blA2hbKCDBVZe
-# 49ciekUJjl3UztwPzIrd/dq3bYHDvzjhlQTETbttqoGEPb0e/WETBUX6ERjpPC0O
-# LfBlzeMSsA+BAPzBMzPwRhInjJ/RK+qMvcsOT9fvgBpnlE1ubvdF60xI2+S6JKd9
-# q3eu05lR7gDrm3kl/iKZ+SEyTK/q+krPeHA8Qp1LMN9zr4DZT5JYCkmQapQ=
+# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFPSH5JqPWQ1zB3Rx
+# iaC5L5HFdkrYMA0GCSqGSIb3DQEBAQUABIIBAMM3XCii3gIORudtKOOycF2kEjzP
+# b34IJSlNev8LCSwXA6GUsKqHS2PpJRvYC4cFZmOq7e7QGv7GeIpmDycsCbdL6t1p
+# qgjoXKFLz5QUGJrsHlmjz2ATDCZauCOuaiPSkMQx820FM1KAb6B3+cFsV1SSlRqb
+# c+08P2dIXrNIMxSOjJ8zWG5O/Adm7avc7KukBwyF9caKsezPLokqrbnqdXA/mDV4
+# vnuxCDMH7rflRLENDDluu6aSJckK6NRW9HXOUGG+guahbSci/DCbWizvjTEyzne0
+# F8jri2WaTXfPY7sqEsR+F6mkyFwyx/NuunAF39DeR67mpm4nzvml4TnV/6Q=
 # SIG # End signature block

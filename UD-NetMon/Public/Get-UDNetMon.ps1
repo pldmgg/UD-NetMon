@@ -53,6 +53,9 @@ function Get-UDNetMon {
 
     # Get all Computers in Active Directory without the ActiveDirectory Module
     [System.Collections.ArrayList]$RemoteHostList = $(GetComputerObjectsInLDAP).Name
+    if ($PSVersionTable.PSEdition -eq "Core") {
+        [System.Collections.ArrayList]$RemoteHostList = $RemoteHostList | foreach {$_ -replace "CN=",""}
+    }
     $null = $RemoteHostList.Insert(0,"Please Select a Server")
 
 
@@ -159,8 +162,8 @@ function Get-UDNetMon {
 # SIG # Begin signature block
 # MIIMiAYJKoZIhvcNAQcCoIIMeTCCDHUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU0FwPV97dc0Ayv7rZlVeyGMkf
-# YqCgggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU8pJ//hGBA1bWtBb3Uv+fImAd
+# /e6gggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
 # 9w0BAQsFADAwMQwwCgYDVQQGEwNMQUIxDTALBgNVBAoTBFpFUk8xETAPBgNVBAMT
 # CFplcm9EQzAxMB4XDTE3MDkyMDIxMDM1OFoXDTE5MDkyMDIxMTM1OFowPTETMBEG
 # CgmSJomT8ixkARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMT
@@ -217,11 +220,11 @@ function Get-UDNetMon {
 # ARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMTB1plcm9TQ0EC
 # E1gAAAH5oOvjAv3166MAAQAAAfkwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwx
 # CjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGC
-# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFNy9GaGzK4IsQL4a
-# BwrYqvZu3darMA0GCSqGSIb3DQEBAQUABIIBAIFhamlqfIUcp4AuOjZt3usRrFBi
-# 3YeLI0rN2SEuOP1m1LzzWJfnoT4HWXsO9XxqKF1O83+KE+UeGIQLa+GIz0RGv+6S
-# Kk1LHu6fQz5Z6GtIe1NhxmQAxYxuD8jTIZbDOOK11oHLWX6r4Sl+LbvTWmauLDic
-# MZqwW4sE0mEt1oG+yfj3Yt+WK6JwWR3xzu5u6X7IQ4a+dd54jigo4OmU4vM9tUza
-# y2amU30c4DeWgKXYbirhxUMVEsKzdXC+/BbYUxeBMfGMFImSu58X1T3BhxX0VPhR
-# c3Rw83qyRLSKU8LRsgYNPnTQEzwJuJrPh+PzSdi/tWONsvQoPdc+OsDl4Dw=
+# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFMW4Hqp1ek/cuIKV
+# Yu+kgoz+YuyzMA0GCSqGSIb3DQEBAQUABIIBAB3dlj2RjYhBpgayLERUK492g4SQ
+# NnkPnp5yr6C3KxLcgVsBcCy7QOoHH3R0oMpCI/n4MnV7Ylph5SNLIV1+WnhYL73j
+# n6FruBPc47IWS4rY4qGvqY9Yg0kSkhTqF5hDlKljmnJzQI9m3sUt2fTI5VFgVbdm
+# HpkYF1KCxlR4/PPHpgVky0Hy/ybvJRZMSJu5yPs3VzfhAXO/1lEL4foPBkF+bxPf
+# xM2aAarg0D2Ic5tt+JFWzUa0W5EmTOAK1yyNiOMcLzZuLk8Rz7w9Lv4SAanaGjr5
+# es6JEesHRa0J7x5rtylpWcvsGDjiNxggp5Rtq96JI8SAdDiUxVXvQ/++pxo=
 # SIG # End signature block

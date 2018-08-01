@@ -40,7 +40,7 @@ if (![bool]$(Get-Module UniversalDashboard.Community)) {
     catch {
         if ($_.Exception.Message -match "\.Net Framework") {
             try {
-                Write-Host "Installing .Net Framework 4.7.2 ..."
+                Write-Host "Installing .Net Framework 4.7.2 ... This will take a little while, and you will need to restart afterwards..."
                 $InstallDotNet47Result = Install-Program -ProgramName dotnet4.7.2 -ErrorAction Stop
             }
             catch {
@@ -121,6 +121,9 @@ function Get-UDNetMon {
 
     # Get all Computers in Active Directory without the ActiveDirectory Module
     [System.Collections.ArrayList]$RemoteHostList = $(GetComputerObjectsInLDAP).Name
+    if ($PSVersionTable.PSEdition -eq "Core") {
+        [System.Collections.ArrayList]$RemoteHostList = $RemoteHostList | foreach {$_ -replace "CN=",""}
+    }
     $null = $RemoteHostList.Insert(0,"Please Select a Server")
 
 
@@ -247,8 +250,8 @@ function Get-UDNetMon {
 # SIG # Begin signature block
 # MIIMiAYJKoZIhvcNAQcCoIIMeTCCDHUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUa8ceT6cTIoDhS9Jp/4OkSBNw
-# 44ugggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZVp9QMMzBAHGVqlPZwdkU6vc
+# e3qgggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
 # 9w0BAQsFADAwMQwwCgYDVQQGEwNMQUIxDTALBgNVBAoTBFpFUk8xETAPBgNVBAMT
 # CFplcm9EQzAxMB4XDTE3MDkyMDIxMDM1OFoXDTE5MDkyMDIxMTM1OFowPTETMBEG
 # CgmSJomT8ixkARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMT
@@ -305,11 +308,11 @@ function Get-UDNetMon {
 # ARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMTB1plcm9TQ0EC
 # E1gAAAH5oOvjAv3166MAAQAAAfkwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwx
 # CjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGC
-# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFGZlLsrjpKHRvill
-# +W1bMyZzgQ9kMA0GCSqGSIb3DQEBAQUABIIBAD0JJnB64hdC75I8LJp9VSS5LK6P
-# dEZPZuH4lwQKWOjV62pZu8A8zhpK+vUaX1wYJymJN1mWPn2zTyVg2iczlSCRWWA3
-# IX2h9FLVF5DRuRS22X38b4rZwAMKgmNkwcLb7hxzaAU0hmYb7LNdmh/MMb60yyh9
-# 7HiFH886K2zd3z68CwV45qxif5TDGl5J4R3xXCgMBye109qJVpNSvjXn9xfmE8z4
-# 5fwsxW5QJifrK4Fs0plMioZbCdpP7OWclC4VrrYMUkbrOFzOgC6g2St7SizpJFda
-# ldFlrkk8IUSpB6bkLo4Fmhiz3TZ8snqx1hTW0Ug4CKhCF/NkV2pYTtCPDkQ=
+# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFPLYnFJv3vdneb+Q
+# Dj5JNnsm1F0IMA0GCSqGSIb3DQEBAQUABIIBAL2OP1hjutXWnpAEFQAB1g1strtf
+# TXLhtyi8DSCgHKH/zUmRsTCI5kGBhGTbFqtYTgSN76MCSsDLR7vPV+ndWT1PYNA3
+# AU0NBCVtq6KEl3pVNGaPtBjLE/JkgXmVTxaBEgFjLDIOFNqZowyo7oiHTCDm7hQq
+# LxE6e6LSEoNoeaoDrXRiLX64cbp1L3KqjngRIbMU33eiqQC4eh3kMT8aS6GIbqoM
+# TqIcyqQ0YqJJyKmZrc17WfKUaACW6JQvxJLFI9ujbMMmDRyzzJxB78J5sLLvOrhH
+# Gc0FOpmBrcFK3idK8ONVctn8YnGZ328unXtsgVeP7Wx4G5aQTXxVH9y1o2k=
 # SIG # End signature block
