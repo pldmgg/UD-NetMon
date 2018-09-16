@@ -12,6 +12,6 @@
     }
     'UniversalDashboard.Community' = @{
         DependencyType  = 'PSGalleryNuget'
-        Version         = 'PreRelease'
+        Version         = 'Latest'
     }
 }
