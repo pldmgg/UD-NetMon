@@ -123,14 +123,31 @@ if ($ModulesToInstallAndImport.Count -gt 0) {
     # Add the Import-Module Universal.Dashboard Module else install .Net Framework 4.7.2 code
     $ImportUDCommCode = @'
 
+if (![bool]$(Get-Module -ListAvailable UniversalDashboard.Community)) {
+    try {
+        Install-Module UniversalDashboard.Community
+    }
+    catch {
+        Write-Error $_
+        $global:FunctionResult = "1"
+        return
+    }
+}
+
 if (![bool]$(Get-Module UniversalDashboard.Community)) {
     try {
         Import-Module UniversalDashboard.Community -ErrorAction Stop
     }
     catch {
         if ($_.Exception.Message -match "\.Net Framework") {
+            Write-Error "This Module requires .Net Framework 4.7.2. Please install it and try the import operation again."
+            Write-Warning "Please run:`n    Remove-Module $ThisModule"
+            $global:FunctionResult = "1"
+            return
+
+            <#
             try {
-                Write-Host "Installing .Net Framework 4.7.2 ... This will take a little while, and you will need to restart afterwards..."
+                Write-Host "Installing .Net Framework 4.7.2 ... This will take awhile ..."
                 $InstallDotNet47Result = Install-Program -ProgramName dotnet4.7.2 -ErrorAction Stop
             }
             catch {
@@ -143,6 +160,7 @@ if (![bool]$(Get-Module UniversalDashboard.Community)) {
 
             Write-Warning ".Net Framework 4.7.2 was installed successfully, however *****you must restart $env:ComputerName***** before using the $ThisModule Module! Halting!"
             return
+            #>
         }
         else {
             Write-Error $_
@@ -155,7 +173,9 @@ if (![bool]$(Get-Module UniversalDashboard.Community)) {
 
 '@
 
-    Add-Content -Value $ImportUDCommCode -Path "$env:BHModulePath\$env:BHProjectName.psm1"
+    if ($env:BHBuildSystem -ne 'AppVeyor') {
+        Add-Content -Value $ImportUDCommCode -Path "$env:BHModulePath\$env:BHProjectName.psm1"
+    }
 
     # Finally, add array the variables contained in VariableLibrary.ps1 if it exists in case we want to use this Module Remotely
     if (Test-Path "$env:BHModulePath\VariableLibrary.ps1") {
@@ -252,8 +272,8 @@ Task Deploy -Depends Build {
 # SIG # Begin signature block
 # MIIMiAYJKoZIhvcNAQcCoIIMeTCCDHUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUmlYBmtIYQGgrNWoZw4HhwFjA
-# zxKgggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUCTVv3ZzeowQt+keF2EyU4bUJ
+# oB+gggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
 # 9w0BAQsFADAwMQwwCgYDVQQGEwNMQUIxDTALBgNVBAoTBFpFUk8xETAPBgNVBAMT
 # CFplcm9EQzAxMB4XDTE3MDkyMDIxMDM1OFoXDTE5MDkyMDIxMTM1OFowPTETMBEG
 # CgmSJomT8ixkARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMT
@@ -310,11 +330,11 @@ Task Deploy -Depends Build {
 # ARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMTB1plcm9TQ0EC
 # E1gAAAH5oOvjAv3166MAAQAAAfkwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwx
 # CjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGC
-# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFE+lsHqRu2w3wDJw
-# SzvT8RRF53/XMA0GCSqGSIb3DQEBAQUABIIBADolwlQOvNK0TE7oWjauZhkk0HxI
-# eD69zCJMV3ie5BId2yCVlhAkKcqswXKS4yfpge0A/RO9S7awCUqX7spBHI+ZyT20
-# 7HQXVHWXDleYJ/EIKnb5rK94vsoRbtBvAkgqmQrGX3F+oGKy4GmNs+dzNbjPvyA7
-# /hAymAmTmkEu+4GR3ygPUmLavFsJva7NqcM7bSgVzwAsNzgAzE1ipku96Gelw1MG
-# PoSVBA9y2hNEHd6xFJzgYKpcV6u08nGWWbYKhtPBoA13UQdu6L14OZJnTK6rTbWW
-# dracDVDusEZkYGwhzIelW4d79J1iD0zYmC19j7R3qyRLvRy/vJeIQWaUmSI=
+# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFAkvWmhWW9HP9pbN
+# N0TvMNP81lbjMA0GCSqGSIb3DQEBAQUABIIBAG2yl57vLKxvQgd4TX/mkVmPA7si
+# TNnIRBHJ05LEm1/a+Shpuf5GB6Qh7LqjEilegsLFMvqOWfpLXbw73wMfGrVzQXgL
+# mzPlJLRASxlp1NdPsX/5++QguXFbwTSCRLn4FsLRl6df2ciDP2vQMVz8BTTFFlMs
+# +AQndZQxpZn0vdSMaAPyEDsesN1FCzQysbJP96kV2rD2HZtreRXtvdmdPMNcUJH7
+# QYJ9SKmingtiZ0MiA/jmtv1gLvwIzFu2HQ96Jr8PzmQ9Bs3yhxRMCSqvBOesVgMo
+# 2K9KXARfQbXphWgy1uC1fMzpDiXpq71KaPP6h575VX6K1vlHxxjsNrGmR4Y=
 # SIG # End signature block

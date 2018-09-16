@@ -199,14 +199,31 @@ function Get-UDNetMon {
 
 
 
+if (![bool]$(Get-Module -ListAvailable UniversalDashboard.Community)) {
+    try {
+        Install-Module UniversalDashboard.Community
+    }
+    catch {
+        Write-Error $_
+        $global:FunctionResult = "1"
+        return
+    }
+}
+
 if (![bool]$(Get-Module UniversalDashboard.Community)) {
     try {
         Import-Module UniversalDashboard.Community -ErrorAction Stop
     }
     catch {
         if ($_.Exception.Message -match "\.Net Framework") {
+            Write-Error "This Module requires .Net Framework 4.7.2. Please install it and try the import operation again."
+            Write-Warning "Please run:`n    Remove-Module $ThisModule"
+            $global:FunctionResult = "1"
+            return
+
+            <#
             try {
-                Write-Host "Installing .Net Framework 4.7.2 ... This will take a little while, and you will need to restart afterwards..."
+                Write-Host "Installing .Net Framework 4.7.2 ... This will take awhile ..."
                 $InstallDotNet47Result = Install-Program -ProgramName dotnet4.7.2 -ErrorAction Stop
             }
             catch {
@@ -219,6 +236,7 @@ if (![bool]$(Get-Module UniversalDashboard.Community)) {
 
             Write-Warning ".Net Framework 4.7.2 was installed successfully, however *****you must restart $env:ComputerName***** before using the $ThisModule Module! Halting!"
             return
+            #>
         }
         else {
             Write-Error $_
@@ -251,8 +269,8 @@ if (![bool]$(Get-Module UniversalDashboard.Community)) {
 # SIG # Begin signature block
 # MIIMiAYJKoZIhvcNAQcCoIIMeTCCDHUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUHfmaZBffI9+JvsGEjmaIWFFj
-# KEagggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU/eJVwLIEN9aC53AG0z8jxhjk
+# NFmgggn9MIIEJjCCAw6gAwIBAgITawAAAB/Nnq77QGja+wAAAAAAHzANBgkqhkiG
 # 9w0BAQsFADAwMQwwCgYDVQQGEwNMQUIxDTALBgNVBAoTBFpFUk8xETAPBgNVBAMT
 # CFplcm9EQzAxMB4XDTE3MDkyMDIxMDM1OFoXDTE5MDkyMDIxMTM1OFowPTETMBEG
 # CgmSJomT8ixkARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMT
@@ -309,11 +327,11 @@ if (![bool]$(Get-Module UniversalDashboard.Community)) {
 # ARkWA0xBQjEUMBIGCgmSJomT8ixkARkWBFpFUk8xEDAOBgNVBAMTB1plcm9TQ0EC
 # E1gAAAH5oOvjAv3166MAAQAAAfkwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwx
 # CjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGC
-# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFMcPyOG5w/rnfDqm
-# jaEfcVzd1sYfMA0GCSqGSIb3DQEBAQUABIIBAGQ9a/3VYVwI9gYNkv49ukvHvkNC
-# zWA5A3R1vVr4L58rC36e11Lqy5FiVmFWXVv0RQDcXu2d6S5fAMJC3jwtnoilgeQL
-# kdq7ZvuXDGOqPHPJQc3SoEpDRXB/+1SHe7FhMS8quE4+ZasveS3EAjV27ao3cgG4
-# 6Q73Skkxl1lUKbTxoySHyLcVRdiIsyW+c/krtds/yCqSyDM/o76I9zDMnGtskTm1
-# qfIcHayxHhmDPYLZKUVnHHdkFJ4Y4+fRRuVyztxhCbynojUfQvSWlwWmZeW+DPpo
-# Fkra6QxP5WXisivdoppbAzYpOkEuiCuT/mky3U8M26rL7IpRIm356V+Wr3o=
+# NwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFDWwP2mn7FKZtZGw
+# fxWISc8uisxrMA0GCSqGSIb3DQEBAQUABIIBAFTrd8QnVN8VrZErK5PnYDUaUZNX
+# zJoayWMjRgqpvdDIFklF7zQJp3Mcn4ZIvKI+oBDG0jsDL63C9upmQ3zxoB5wK3mZ
+# gQHuiIZ1nKEjGq5DeDWSWsz2f1voQC5ji7Z6cYnP0dmo5vnHtqf0hF0I2Ps6rQX2
+# 9jJ76sc4SzNU7HnlVmJr/ye1LWURcO0yZgL5gDVm6sHatH4ZFt6YE2/kRv6kgsPv
+# TPGXkVQGFRgISQFN/VUos3dBp7KlDXAO5ypD1ACR0pDpMOqRJD0cDwh2azVW3yfW
+# Cs7PhVBo0IW6rHAIHN6hdwcKSBAjhW1OfuM/G9ajkiq0MCjTRkjR0J+x2vg=
 # SIG # End signature block
